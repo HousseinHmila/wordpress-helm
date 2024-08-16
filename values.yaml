@@ -1,0 +1,94 @@
+namespaces:
+  - name: poly
+
+deployment:
+  - app: wordpress
+    namespace: poly
+    replicas: 1
+    volumes:
+      - name: wordpress-persistent-storage
+        persistentVolumeClaim:
+          claimName: local-pv-claim
+    containers:
+      - repository: wordpress:php8.1-apache
+        name: wordpress
+        env:
+        - name: WORDPRESS_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: my-config-map
+              key: db-endpoint
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: my-wordpress-db-secret
+              key: password
+        - name: WORDPRESS_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: my-wordpress-db-secret
+              key: username
+        - name: WORDPRESS_DB_NAME
+          value: wordpressdb
+        resources:
+          requests:
+            cpu: "20m"
+            memory: "50mi"
+          limits:
+            cpu: "20m"
+            memory: "60Mi"
+        port: 80
+        volumeMounts:
+        - name: wordpress-persistent-storage
+          mountPath: "/var/www/html"
+        readinessProbe:
+          httpGet:
+            path: "/"
+          initialDelaySeconds: 5
+          periodSeconds: 30
+        livenessProbe:
+          httpGet:
+            path: "/"
+        initialDelaySeconds: 15
+        periodSeconds: 50
+
+
+service:
+  - name: wordpress-svc
+    namespace: poly
+    protocol: TCP
+    targetPort: 80
+    port: 80
+    type: LoadBalancer
+    app: wordpress
+
+configMap:
+  - name: my-config-map
+    namespace: poly
+    data:
+       dbEndpoint:  wordpress-db.cvmeosagizu9.eu-north-1.rds.amazonaws.com:3306
+
+# Values for Secret
+secret:
+  - name: my-wordpress-db-secret
+    namespace: poly
+    data:
+      dbUsername: admin
+      dbPassword: strass22
+
+
+persistentVolume:
+  - name: local-pv
+    accessModes:
+      - ReadWriteOnce
+    storage: 10Gi
+    hostPath: /mnt/
+
+persistentVolumeClaim:
+  - name: local-pv-claim
+    namespace: poly
+    accessModes:
+      - ReadWriteOnce
+    storage: 10Gi
+    
+

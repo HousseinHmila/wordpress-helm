@@ -1,0 +1,76 @@
+{{- range $app := .Values.deployment }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ $app.app }}
+  name: {{ $app.app }}
+  namespace: {{ $app.namespace }}
+spec:
+  replicas: {{ $app.replicas }}
+  selector:
+    matchLabels:
+      app: {{ $app.app }}
+  template:
+    metadata:
+      labels:
+        app: {{ $app.app }}
+    spec:
+      {{- if $app.volumes }}
+      volumes:
+        {{- range $vol := $app.volumes }}
+        - name: {{ $vol.name }}
+          persistentVolumeClaim:
+            claimName: {{$vol.persistentVolumeClaim.claimName}}
+          {{- if $vol.configMap }}
+          configMap:
+            name: {{ $vol.configMap.name }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      containers:
+      {{- range $cont := $app.containers }}
+      - image: {{ $cont.repository }}
+        name: {{ $cont.name }}
+        resources:
+          limits:
+            memory: {{ $cont.resources.limits.memory }}
+            cpu: {{ $cont.resources.limits.cpu }}
+        ports:
+          - containerPort: {{ $cont.port }}
+        {{- if $cont.env }}
+        volumeMounts:
+          {{- range $volm := $cont.volumeMounts }}
+          - name: {{ $volm.name }}
+            mountPath: {{ $volm.mountPath }}
+          {{- end}}
+        env:
+         {{- range $env := $cont.env }}
+         - name: {{ $env.name }}
+           {{- if $env.value }}
+           value: {{ $env.value }}
+           {{- else if $env.valueFrom }}
+           valueFrom:
+             {{- if $env.valueFrom.secretKeyRef }}
+             secretKeyRef:
+               name: {{ $env.valueFrom.secretKeyRef.name }}
+               key: {{ $env.valueFrom.secretKeyRef.key }}
+             {{- else if $env.valueFrom.configMapKeyRef }}
+             configMapKeyRef:
+               name: {{ $env.valueFrom.configMapKeyRef.name }}
+               key: {{ $env.valueFrom.configMapKeyRef.key }}
+             {{- end }}
+           {{- end }}
+         {{- end }}
+       {{- end }}
+        {{- if $app.volumeMounts }}
+        volumeMounts:
+          {{- range $vol := $app.volumeMounts }}
+          - name: {{ $vol.name }}
+            mountPath: {{ $vol.mountPath }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+{{- end }}
+

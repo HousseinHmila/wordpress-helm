@@ -1,0 +1,14 @@
+{{- range $pv := .Values.persistentVolume }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $pv.name }}
+spec:
+  accessModes:
+    - {{ $pv.accessModes | first }}
+  capacity:
+    storage: {{ $pv.storage }}
+  volumeMode: Filesystem
+  hostPath:
+    path: {{ $pv.hostPath }}
+  {{- end}}

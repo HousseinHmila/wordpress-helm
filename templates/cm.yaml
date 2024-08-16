@@ -1,0 +1,12 @@
+{{- range $cm := .Values.configMap }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $cm.name }}
+  namespace: {{ $cm.namespace }}
+data:
+  db-endpoint: "{{ $cm.data.dbEndpoint }}"
+{{- end}}
+   
+
