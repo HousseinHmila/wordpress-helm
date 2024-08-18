@@ -32,11 +32,11 @@ deployment:
           value: wordpressdb
         resources:
           requests:
-            cpu: "100m"
-            memory: "100mi"
+            cpu: "300m"
+            memory: "300Mi"
           limits:
-            cpu: "200m"
-            memory: "200Mi"
+            cpu: "600m"
+            memory: "600Mi"
         port: 80
         volumeMounts:
         - name: wordpress-persistent-storage
@@ -59,7 +59,7 @@ service:
     protocol: TCP
     targetPort: 80
     port: 80
-    type: NodePort
+    type: LoadBalancer
     app: wordpress
 
 configMap:
