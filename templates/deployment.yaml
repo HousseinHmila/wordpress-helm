@@ -34,6 +34,9 @@ spec:
       - image: {{ $cont.repository }}
         name: {{ $cont.name }}
         resources:
+          requests:
+            memory: {{ $cont.resources.requests.memory }}
+            cpu: {{ $cont.resources.requests.cpu }}
           limits:
             memory: {{ $cont.resources.limits.memory }}
             cpu: {{ $cont.resources.limits.cpu }}
