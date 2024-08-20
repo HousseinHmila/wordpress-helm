@@ -7,7 +7,6 @@ metadata:
   namespace: {{ $cm.namespace }}
 data:
   db-endpoint: "{{ $cm.data.dbEndpoint }}"
-  db-name: "{{ $cm.data.db-name }}"
 {{- end}}
    
 
