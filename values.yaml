@@ -29,7 +29,10 @@ deployment:
               name: my-wordpress-db-secret
               key: username
         - name: WORDPRESS_DB_NAME
-          value: wordpressdb
+          valueFrom:
+            configMapKeyRef:
+              name: my-config-map
+              key: db-name
         resources:
           requests:
             cpu: "300m"
@@ -67,6 +70,7 @@ configMap:
     namespace: poly
     data:
        dbEndpoint:  wordpress-db.cvmeosagizu9.eu-north-1.rds.amazonaws.com:3306
+       db-name: wordpressdb
 
 # Values for Secret
 secret:
