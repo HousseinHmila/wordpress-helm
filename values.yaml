@@ -69,8 +69,8 @@ configMap:
   - name: my-config-map
     namespace: poly
     data:
-       dbEndpoint:  wordpress-db.cvmeosagizu9.eu-north-1.rds.amazonaws.com:3306
-       db-name: wordpressdb
+       dbEndpoint:  d29yZHByZXNzLWRiLmMxaXdnbTRnMDBseS5ldS13ZXN0LTMucmRzLmFtYXpvbmF3cy5jb20K:3306
+       db-name: d29yZHByZXNzZGIK
 
 # Values for Secret
 secret:
